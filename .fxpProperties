@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<fxpProperties abbreviated="false" authoringTool="Flex Builder" compiles="true" parentProject="6bff693c-8670-4a99-a336-36bccd14c7dd" projectUUID="6bff693c-8670-4a99-a336-36bccd14c7dd" pureCatalystProject="false" sdkVersion="4.6.0" uuid="55fb8d49-6066-4886-abd7-addd88f7b393" version="15">
+  <projects/>
+  <src/>
+  <swc>
+    <linked location="sdkPlaceHolder" path="sdkPlaceHolder" position="0" uuid="55fb8d49-6066-4886-abd7-addd88f7b393"/>
+    <linked location="C:/Users/Crystal/Adobe Flash Builder 4.6/FoodGameProject/libs" path="/libs" position="1" uuid="55fb8d49-6066-4886-abd7-addd88f7b393"/>
+  </swc>
+  <misc/>
+  <theme/>
+  <mxmlFormattingPrefs groupAttributesByState="true" maxLineWidth="100" mxmlAlignAttributes="true" mxmlAttributeOrder="id,userLabel,includeIn,excludeFrom,visible,x,y,z,left,right,top,bottom,width,height,minWidth,minHeight,maxWidth,maxHeight,label" mxmlKeepAttributeValuesOrganized="true"/>
+</fxpProperties>

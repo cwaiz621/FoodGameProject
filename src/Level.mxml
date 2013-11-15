@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="800" height="700"  
+		 xmlns:local="*"
+		 creationComplete="init()">
+	
+	<fx:Script>
+		<![CDATA[
+			//importat necessary Flex libraries
+			import flash.display.Sprite;
+			import flash.events.TimerEvent;
+			import flash.utils.Timer;
+			import flash.media.Sound; 
+			import flash.net.URLRequest; 
+			
+			import mx.controls.Alert;
+			import mx.core.UIComponent;
+			import mx.events.CloseEvent;
+			
+
+			
+			//Declare player variable
+			public var player:Player;
+
+			
+			//Declaring level
+			public var level:int=1;
+			
+			
+			//pre-set scores
+			public var score1:int = 0;
+			public var score2:int = 0;
+			public var score3:int = 0;
+			public var scoreLimit:int=2;
+			
+			public var Playing:Boolean = true;
+			
+			//Food Names - level 1
+			public var name1:String;
+			public var name2:String;
+			public var name3:String;
+			//Food Names - level 2
+			public var name4:String;
+			public var name5:String;
+			public var name6:String;
+			//Food Names - level 3
+			public var name7:String;
+			public var name8:String;
+			public var name9:String;
+			
+			//Declaring the food items and arrays
+			private var food:Food
+			public var foods:Array;
+			public var foodItem:Array
+			
+			//Declaring Sound
+			//var req:URLRequest = new URLRequest("../Assets/crunch.mp3"); 
+			//var s:Sound = new Sound(req);
+			[Embed(source="Assets/crunch.mp3")]
+			public var soundClass:Class;
+			public var crunch:Sound = new soundClass() as Sound;
+			
+			//Timer to create Food Items and update position
+			private var createFood:Timer = new Timer(3*1000,0);
+			private var updatePosition:Timer = new Timer(3,0);
+			private var randomEvent:Timer = new Timer(3*1000*Math.random(),1);
+			
+			// Drawing the player and starting the Timers
+			protected function init():void {
+					
+				if(p != null){					
+					p.draw()					
+				}	
+				if (level==1){
+					scoreLimit=2
+					bg.source="../images/BabyBackground.jpg"
+					p1.source="../images/Milk.png"
+					p2.source="../images/BabyFood.png"	
+					p3.source="../images/AppleSauce.png"	
+					//debug.text=score1.toString()
+					//debug1.text=score2.toString()
+				}else if(level==2){
+					scoreLimit=5
+					bg.source="../images/BoyBackground.png"
+					p1.source="../images/Soda.png"
+					p2.source="../images/pizza.png"	
+					p3.source="../images/Chips.png"
+				} else {
+					scoreLimit=10
+					bg.source="../images/LivingBackground.jpg"
+					p1.source="../images/Tea.png"
+					p2.source="../images/rice.png"	
+					p3.source="../images/soup.png"
+				}
+				
+				//initialize score
+				Score1.text= ""+score1+" / "+scoreLimit.toString() 	
+				Score2.text= ""+score2+" / "+scoreLimit.toString() 	
+				Score3.text= ""+score3+" / "+scoreLimit.toString() 	
+				
+				//call set food function - different levels have different food
+				setFood()
+				
+				//create food item array
+				foodItem= new Array;
+				
+				//start timers
+				createFood.start();
+				updatePosition.start()
+				
+				//Deine event listeners	
+				createFood.addEventListener(TimerEvent.TIMER, randomTimer);
+				updatePosition.addEventListener(TimerEvent.TIMER, position);
+				randomEvent.addEventListener(TimerEvent.TIMER, createF);
+			}
+	
+			// call hit player function everytime position timer goes off
+			protected function position(event:TimerEvent):void{
+				hitPlayer()
+			}
+			
+			//setting the food names for different levels
+			protected function setFood():void{
+				if(level==1){
+					name1="milk";
+					name2="babyfood";
+					name3="appleSauce";
+				}else if(level==2){
+					name4="milk";
+					name5="babyfood";
+					name6="appleSauce";
+					//Food Names - level 2
+					name1="soda";
+					name2="pizza";
+					name3="chips";
+				}else{
+					//Food Names - level 1
+					name7="milk";
+					name8="babyfood";
+					name9="appleSauce";
+					//Food Names - level 2
+					name4="soda";
+					name5="pizza";
+					name6="chips";
+					//Food Names - level 3
+					name1="tea";
+					name2="rice";
+					name3="soup";
+				}
+			}
+			
+			
+			//generating random times for food to be created
+			protected function randomTimer(event:TimerEvent):void{	
+				randomEvent.start();
+			}
+			
+			//Creating food Items
+			protected function createF(event:TimerEvent):void {
+				randomEvent.stop();
+				var foods:Array=new Array
+				if (level==1){
+					foods = [ name1, name2, name3 ];
+				}else if(level==2){
+					foods= [ name1, name2, name3, name4, name5, name6];
+				}else if(level==3){
+					foods = [ name1, name2, name3, name4, name5, name6, name7, name8, name9];
+				}
+				var i:int = Math.random()*foods.length						
+				var newFood:Food = new Food(foods[i],0,0);
+				newFood.x = (Math.random()*width)-30;
+				newFood.y = 10;
+				foodItem.push(newFood)
+				
+				addElement(newFood);	
+				}
+		
+			// hit if enenmy position = player position
+			protected function hitPlayer():void{						
+				for(var i:int=0; i<foodItem.length; i++){
+					if((foodItem[i].y + foodItem[i].food.width > p.y)&&(foodItem[i].x + foodItem[i].food.width > p.x)&&(foodItem[i].x < p.x + p.myBitmap.width)){
+					
+						food= foodItem[i];
+						foodItem[i].y = stage.stageHeight;
+						crunch.play();
+						score();
+						foodItem.splice(i,1);
+						break;
+				}else if(foodItem[i].y + foodItem[i].width>=stage.stageHeight){
+					foodItem.splice(i,1);
+					break;
+				}
+					
+				}
+				//foodItem.splice(i,1);
+			}
+			
+			// Add score when an enemy is hit
+			protected function score():void{
+				if(score1<=scoreLimit && score2<=scoreLimit && score3<=scoreLimit &&(food.foodName==name1 || food.foodName==name2 || food.foodName==name3)){
+					if(food.foodName==name1){
+					score1++
+					//debug.text=score1.toString()
+					if(score1==scoreLimit && score2==scoreLimit && score3==scoreLimit){
+						Score1.text= ""+score1+" / "+scoreLimit.toString()
+						youWin()
+					}else if(score1>scoreLimit){	
+						//debug.text=score1.toString()
+						youLose()
+					}else{Score1.text= ""+score1+" / "+scoreLimit.toString() 
+					}//debug.text=score1.toString()
+				}
+				else if(food.foodName==name2){
+					score2++
+					//debug1.text=score2.toString()
+					if(score1==scoreLimit && score2==scoreLimit && score3==scoreLimit){
+						Score2.text= ""+score2+" / "+scoreLimit.toString() 
+						youWin()
+				}else if(score2>scoreLimit){		
+						youLose()
+					}else{Score2.text= ""+score2+" / "+scoreLimit.toString() 
+					}	
+					//debug1.text=score2.toString()
+				}
+				else if(food.foodName==name3){
+					score3++
+					//debug2.text=score3.toString()
+					if(score1==scoreLimit && score2==scoreLimit && score3==scoreLimit){
+						Score3.text= ""+score3+" / "+scoreLimit.toString() 
+						updatePosition.stop()
+						youWin()				
+					}else if(score3>scoreLimit){	
+						youLose()
+					}else{Score3.text= ""+score3+" / "+scoreLimit.toString() 
+					}
+				}}else{
+					youLose()}
+			}
+				
+			
+			// Call fucntion when you win			
+			protected function youWin():void{
+				createFood.stop();
+				updatePosition.stop()
+				for(var i:int=0; i<foodItem.length; i++){
+					foodItem[i].y = stage.stageHeight;}
+				
+				if(level==3){			
+					Alert.okLabel= "New Game"
+					Alert.show("Would you like to play again","You Win",0x4,null,newGame);
+				}else{
+					level++;
+					Alert.buttonWidth=100
+					Alert.okLabel ="Next Level"
+					Alert.show("Next Level, Level " + level,"Next Level",0x4,null,nextLevel);
+				}
+			}
+			
+			//Call fuction when you lose
+			protected function youLose():void{
+				createFood.stop();
+				updatePosition.stop();
+				
+				randomEvent.stop();
+				//Playing=false;
+				for(var i:int=0; i<foodItem.length; i++){
+					foodItem[i].y = stage.stageHeight;}
+				if(score1>scoreLimit){
+					Alert.okLabel ="New Game"
+					Alert.show("You Lose! Too many " + name1,"Game Over",0x4,null,newGame);
+				}else if(score2>scoreLimit){
+					Alert.okLabel ="New Game"
+					Alert.show("You Lose! Too many " + name2,"Game Over",0x4,null,newGame);
+				}else if(score3>scoreLimit){
+					Alert.okLabel ="New Game"
+					Alert.show("You Lose! Too many " + name3,"Game Over",0x4,null,newGame);
+				}else{
+					Alert.okLabel ="New Game"
+					Alert.show("Wrong Food","Game Over",0x4,null,newGame)
+				}		
+			}
+			
+			//call function when a new game is set
+			private function newGame(event:CloseEvent):void{
+				level=1;
+				score1=0;
+				score2=0;
+				score3=0;
+				p.Playerlevel=level
+				init()				
+			}
+			
+			private function nextLevel(event:CloseEvent):void{
+				score1=0;
+				score2=0;
+				score3=0;
+				p.Playerlevel=level
+				p.height=p.myBitmap.height	
+				init()				
+			}			
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+
+
+	
+	<mx:Image id="bg" x="-55" y="-2" width="883" height="754" source="../images/BoyBackground.png"/>
+	
+	<s:VGroup x="742" y="10" width="38" height="200" textAlign="center">
+		<mx:Image id="p1" width="25" height="31" source="../images/Milk.png" />
+		<s:Label id="Score1" fontSize="14" fontWeight="bold"/>
+		<mx:Image id="p2" width="25" height="31" source="../images/BabyFood.png"/>
+		<s:Label id="Score2" fontSize="14" fontWeight="bold"/>
+		<mx:Image id="p3" width="25" height="31" source="../images/AppleSauce.png"/>
+		<s:Label id="Score3" fontSize="14" fontWeight="bold"/>
+	</s:VGroup>
+	
+	
+	<local:Player id="p"  x="100" y="{this.height - p.height}" Playerlevel="{this.level}"/>
+	<!--<s:Label id="debug" x="50" y="50" text="bleh" />
+	<s:Label id="debug1" x="50" y="70" text="bleh" />
+	<s:Label id="debug2" x="50" y="90" text="bleh" />-->
+	
+	
+</s:Group>
+
