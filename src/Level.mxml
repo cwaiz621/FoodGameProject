@@ -78,7 +78,7 @@
 					p1.source="../images/Milk.png"
 					p2.source="../images/BabyFood.png"	
 					p3.source="../images/AppleSauce.png"	
-					//debug.text=score1.toString()
+					debug.text=score1.toString()
 					//debug1.text=score2.toString()
 				}else if(level==2){
 					scoreLimit=5
@@ -321,9 +321,9 @@
 	
 	
 	<local:Player id="p"  x="100" y="{this.height - p.height}" Playerlevel="{this.level}"/>
-	<!--<s:Label id="debug" x="50" y="50" text="bleh" />
+	<s:Label id="debug" x="50" y="50" text="bleh" />
 	<s:Label id="debug1" x="50" y="70" text="bleh" />
-	<s:Label id="debug2" x="50" y="90" text="bleh" />-->
+	<s:Label id="debug2" x="50" y="90" text="bleh" />
 	
 	
 </s:Group>
